@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+
+        <act_window
+			id="action_importer_supplier"
+			name="Importer supplier"
+			res_model="importer.supplier"
+			view_mode="tree,form,search" />
+
+        <menuitem id="menu_importer_supplier_root"
+                  name="Importer Supplier"
+                  parent="purchase.menu_purchase_root"
+                  sequence="1" />
+
+        <!-- top level menu: Amazon -->
+		<menuitem name="Importer"
+                  id="menu_importer_supplier"
+                  parent="menu_importer_supplier_root"
+                  sequence="20"
+                  action="action_importer_supplier" />
+
+		<record id="view_importer_supplier_form" model="ir.ui.view">
+			<field name="name">Importer</field>
+			<field name="model">importer.supplier</field>
+			<field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button string="Import products from supplier" type="object" name="synchronize_product_supplier" class="oe_highlight"/>
+                    </header>
+                    <group name="Importer products config">
+                        <group><field name="importer_type" widget="radio"/></group>
+                        <group name="Web crawler" attrs="{'invisible': [('importer_type', 'in', ['CSV', 'SOAP'])]}">
+                            <field name="importer_web_id"/>
+                        </group>
+                        <group name="CSV" attrs="{'invisible': [('importer_type', 'in', ['web', 'SOAP'])]}">
+                            <field name="importer_csv_id"/>
+                        </group>
+                        <group name="SOAP" attrs="{'invisible': [('importer_type', 'in', ['CSV', 'web'])]}">
+                            <field name="importer_soap_id"/>
+                        </group>
+                        <group>
+                            <field name="tax_included"/>
+                        </group>
+                    </group>
+                </form>
+			</field>
+		</record>
+
+        <record id="view_importer_supplier_tree" model="ir.ui.view">
+			<field name="name">Importer supplier</field>
+			<field name="model">importer.supplier</field>
+			<field name="arch" type="xml">
+                <tree>
+                    <field name="partner_id"/>
+                    <field name="importer_type"/>
+                </tree>
+			</field>
+		</record>
+
+        <act_window
+			id="action_importer_supplier_webcrawler"
+			name="Web Crawler"
+			res_model="importer.supplier.webcrawler"
+			view_mode="tree,form,search" />
+
+        <record id="view_importer_supplier_webcrawler_form" model="ir.ui.view">
+			<field name="name">Web Crawler</field>
+			<field name="model">importer.supplier.webcrawler</field>
+			<field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group><field name="name"/></group>
+                        <group><field name="url"/></group>
+                        <group><field name="url_login"/></group>
+                    </group>
+                    <group>
+                        <field name="params_login_ids"/>
+                    </group>
+                    <group>
+                        <group><field name="currency_id"/></group>
+                        <group><field name="tax_included"/></group>
+                    </group>
+
+                    <group><field name="has_pagination"/><field name="next_page_expr_href_ids"/></group>
+                    <group><field name="get_products"/><field name="product_box_data_expr_ids"/></group>
+                    <group>
+                        <group><field name="sku_expr_ids"/></group>
+                        <group><field name="name_expr_ids"/></group>
+                    </group>
+                    <group>
+                        <group><field name="price_expr_ids"/></group>
+                        <group><field name="url_image_expr_ids"/></group>
+                    </group>
+                    <group>
+                        <group><field name="ean_expr_ids" /></group>
+                        <group><field name="type_stock" /><field name="stock_expr_ids"/></group>
+                    </group>
+                    <group>
+                        <group><field name="short_description_expr_ids"/></group>
+                        <group><field name="large_description_expr_ids"/></group>
+                    </group>
+                    <group>
+                        <field name="child_expr_ids"/>
+                    </group>
+                    <group><field name="child_crawler_ids"/></group>
+                    <footer>
+                        <button string="Import child crawlers" type="object" name="import_child_crawlers" class="oe_highlight"/>
+                    </footer>
+                </form>
+			</field>
+		</record>
+
+
+		<act_window
+			id="action_importer_supplier_csv"
+			name="CSV importer"
+			res_model="importer.supplier.csv"
+			view_mode="form,tree,search"
+		/>
+
+        <record id="view_importer_supplier_csv_form" model="ir.ui.view">
+			<field name="name">CSV importer</field>
+			<field name="model">importer.supplier.csv</field>
+			<field name="arch" type="xml">
+                <form>
+                    <group><field name="url"/></group>
+                    <group>
+                        <group><field name="user"/></group>
+                        <group><field name="password"/></group>
+                    </group>
+                    <group>
+                        <group><field name="delimiter"/></group>
+                        <group><field name="lineterminator"/></group>
+                        <group><field name="has_title_row"/></group>
+                    </group>
+                    <group><field name="relation_column_ids"/></group>
+                </form>
+			</field>
+		</record>
+
+        <act_window
+			id="action_importer_supplier_csv_relation"
+			name="Relation csv Number column-Field product"
+			res_model="importer.supplier.csv.columnrelation"
+			view_mode="form,tree"
+		/>
+
+        <record id="view_importer_supplier_csv_relation_tree" model="ir.ui.view">
+			<field name="name">Relation number's column with field's product</field>
+			<field name="model">importer.supplier.csv.columnrelation</field>
+			<field name="arch" type="xml">
+                <tree>
+                    <field name="num_column"/>
+                    <field name="field_product"/>
+                </tree>
+			</field>
+		</record>
+
+		<record id="view_importer_supplier_csv_relation_form" model="ir.ui.view">
+			<field name="name">Relation number's column with field's product form</field>
+			<field name="model">importer.supplier.csv.columnrelation</field>
+			<field name="arch" type="xml">
+                <form>
+                    <group name="Relation">
+                        <group><field name="num_column"/></group>
+                        <group><field name="field_product"/></group>
+                    </group>
+                </form>
+			</field>
+		</record>
+
+
+		<act_window
+			id="action_importer_search_expression"
+			name="Importer expression"
+			res_model="importer.supplier.get.expression"
+			view_mode="form,tree"
+		/>
+
+		<record id="view_importer_search_expression_form" model="ir.ui.view">
+			<field name="name">Expression to search</field>
+			<field name="model">importer.supplier.get.expression</field>
+			<field name="arch" type="xml">
+				<form>
+					<group><field name="type_expression"/></group>
+                    <group><field name="expression"/></group>
+                </form>
+			</field>
+		</record>
+        <record id="view_importer_search_expression_tree" model="ir.ui.view">
+			<field name="name">Expression</field>
+			<field name="model">importer.supplier.get.expression</field>
+			<field name="arch" type="xml">
+				<tree>
+                    <field name="type_expression"/>
+                    <field name="expression"/>
+                </tree>
+			</field>
+		</record>
+
+        <record id="view_importer_login_param_form" model="ir.ui.view">
+			<field name="name">Expression</field>
+			<field name="model">importer.supplier.webscrawler.login.param</field>
+			<field name="arch" type="xml">
+				<form>
+                    <field name="name"/>
+                    <field name="param"/>
+                </form>
+			</field>
+		</record>
+
+
+        <act_window
+			id="action_importer_webcrawler_child"
+			name="Importer child expression"
+			res_model="importer.supplier.webscrawler.child.expr"
+			view_mode="form,tree"
+		/>
+
+        <record id="view_importer_webcrawler_child_tree" model="ir.ui.view">
+			<field name="name">Child import</field>
+			<field name="model">importer.supplier.webscrawler.child.expr</field>
+			<field name="arch" type="xml">
+				<tree>
+                    <field name="name_expr_ids"/>
+                    <field name="url_expr_ids"/>
+                </tree>
+			</field>
+		</record>
+
+        <record id="view_importer_webcrawler_child_form" model="ir.ui.view">
+			<field name="name">Child import</field>
+			<field name="model">importer.supplier.webscrawler.child.expr</field>
+			<field name="arch" type="xml">
+				<form>
+                    <group><field name="child_get_products"/><field name="child_has_pagination"/></group>
+                    <group><field name="name_expr_ids"/><field name="url_expr_ids"/></group>
+                </form>
+			</field>
+		</record>
+
+	</data>	
+</odoo>
+
