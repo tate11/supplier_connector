@@ -6,12 +6,6 @@ from odoo import models, fields, api
 class Supplier(models.Model):
     _inherit = 'res.partner'
 
-    @api.depends('prefix_supplier_prod')
-    def _compute_sku_products(self):
-        import wdb
-        wdb.set_trace()
-        self.env['product.template'].search([()])
-
     prefix_supplier_prod = fields.Char('Prefix supplier to import products', default='')
 
     importer_ids = fields.One2many('importer.supplier', 'partner_id', 'Importer product\'s supplier')
@@ -29,9 +23,14 @@ class ImporterSupplier(models.Model):
         return ''
 
     @api.multi
-    def _save_data_product(self, supplier, list_prod, prefix):
-        import wdb
-        wdb.set_trace()
+    def _save_data_product(self, importer, list_prod, prefix):
+        '''
+        This method save the data of list_prod on our Odoo instance
+        :param importer: importer that has revered the data
+        :param list_prod: list of product to sign up
+        :param prefix: prefix to put on sku of the supplier's products to import
+        :return:
+        '''
         for prod in list_prod:
             try:
                 res_prod = self.env['product.template'].search(
@@ -49,7 +48,7 @@ class ImporterSupplier(models.Model):
                     # res_prod['image'] = prod.get('image')
                     result = self.env['product.template'].write(w_prod)
                     if result:
-                        sup_prod = {'name':supplier.id}
+                        sup_prod = {'name':importer.id}
                         sup_prod['product_name'] = w_prod['name']
                         sup_prod['product_code'] = prod_code
                         if prod.get('min_qty'):
@@ -67,7 +66,7 @@ class ImporterSupplier(models.Model):
                         prod['image'] = prod['urls_image'][0][1]
                     result = self.env['product.template'].create(prod)
                     if result:
-                        sup_prod = {'name':supplier.partner_id.id}
+                        sup_prod = {'name':importer.partner_id.id}
                         sup_prod['product_name'] = prod['name']
                         sup_prod['product_code'] = prod_code
                         sup_prod['price'] = result._compute_price_without_taxes(float(prod.get('standard_price'))) if prod.get('tax_included') \
@@ -112,7 +111,7 @@ class ImporterSupplier(models.Model):
                 prefix = prefix + '_'
 
             if list_product:
-                self._save_data_product(supplier=importer, list_prod=list_product, prefix=prefix)
+                self._save_data_product(importer=importer, list_prod=list_product, prefix=prefix)
 
     partner_id = fields.Many2one('res.partner',
                                  'Supplier of products for import',
@@ -151,8 +150,6 @@ class ProductTemplate(models.Model):
 
     @api.model
     def _compute_image_url(self):
-        import wdb
-        wdb.set_trace()
         import base64
         import requests
 
